@@ -1,0 +1,14 @@
+[package]
+name = "pandora-util"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "util"
+
+[dependencies]
+output_format = { path = "output_format" }
+
+[workspace]
+default-members = ["output_format"]
+members = ["output_format"]
