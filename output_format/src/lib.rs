@@ -15,8 +15,9 @@ extern crate amplify;
 #[macro_use]
 extern crate clap;
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fmt::Display;
+use std::hash::Hash;
 use std::str::FromStr;
 
 use colored::Colorize;
@@ -101,6 +102,74 @@ where T: OutputCompact
 
 impl<T> OutputFormat for Vec<T>
 where T: OutputFormat
+{
+    fn output_print(&self, format: Formatting) {
+        if self.is_empty() {
+            eprintln!("{}", "No items".red());
+            return;
+        }
+        let headers = T::output_headers();
+        if format == Formatting::Tab {
+            println!("{}", headers.join("\t").bright_green())
+        } else if format == Formatting::Csv {
+            println!("{}", headers.join(","))
+        }
+        self.iter().for_each(|t| t.output_print(format));
+    }
+
+    #[doc(hidden)]
+    fn output_id_string(&self) -> String { unreachable!() }
+
+    #[doc(hidden)]
+    fn output_headers() -> Vec<String> { unreachable!() }
+
+    #[doc(hidden)]
+    fn output_fields(&self) -> Vec<String> { unreachable!() }
+}
+
+#[doc(hidden)]
+impl<T> OutputCompact for BTreeSet<T>
+where T: OutputCompact
+{
+    fn output_compact(&self) -> String { unreachable!() }
+}
+
+impl<T> OutputFormat for BTreeSet<T>
+where T: OutputFormat + Ord + Eq + Hash
+{
+    fn output_print(&self, format: Formatting) {
+        if self.is_empty() {
+            eprintln!("{}", "No items".red());
+            return;
+        }
+        let headers = T::output_headers();
+        if format == Formatting::Tab {
+            println!("{}", headers.join("\t").bright_green())
+        } else if format == Formatting::Csv {
+            println!("{}", headers.join(","))
+        }
+        self.iter().for_each(|t| t.output_print(format));
+    }
+
+    #[doc(hidden)]
+    fn output_id_string(&self) -> String { unreachable!() }
+
+    #[doc(hidden)]
+    fn output_headers() -> Vec<String> { unreachable!() }
+
+    #[doc(hidden)]
+    fn output_fields(&self) -> Vec<String> { unreachable!() }
+}
+
+#[doc(hidden)]
+impl<T> OutputCompact for HashSet<T>
+where T: OutputCompact
+{
+    fn output_compact(&self) -> String { unreachable!() }
+}
+
+impl<T> OutputFormat for HashSet<T>
+where T: OutputFormat + Eq + Hash
 {
     fn output_print(&self, format: Formatting) {
         if self.is_empty() {
